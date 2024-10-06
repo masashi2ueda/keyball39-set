@@ -1,10 +1,10 @@
 module create_base_case1() {
-    import("./bambucase2.stl");
+    import("./src_stl/ball_right.stl");
 }
 
 module create_base_case2() {
     translate([-138, 0, 0])
-    import("./noball_left.stl");
+    import("./src_stl/noball_left.stl");
 }
 
 // gear_num:ギアの個数, h:ギアの高さ, r=ギアの半径, rd:一つのギアの縦横比
@@ -80,13 +80,13 @@ module create_armrest_c_cube(cube_c_size, bar_cylinder_r, bar_cylinder_w, bar_cr
     create_armrest_c(bar_cylinder_r, bar_cylinder_w, bar_crearance, bar_r_crearance);
 }
 
-module create_armrest_plate(thickness) {
+module create_armrest_plate(thickness, plate_d) {
     w1 = 100;
     w2 = 70;
     w3 = 50;
-    h1 = -100;
-    h2 = -110;
-    h3 = -120;
+    h1 = -plate_d;
+    h2 = -plate_d-10;
+    h3 = -plate_d-20;
     hull() {
         translate([-w1/2, 0, 0])
         cylinder(r=5, h = thickness,$fn=50);
@@ -109,9 +109,8 @@ module create_armrest_plate(thickness) {
     }
 }
 
-module create_armrest(cube_c_size, bar_cylinder_r, bar_cylinder_w, bar_crearance, bar_r_crearance, plate_thickness, bar_space_w) {
-    echo(plate_thickness=plate_thickness);
-    create_armrest_plate(plate_thickness);
+module create_armrest(cube_c_size, bar_cylinder_r, bar_cylinder_w, bar_crearance, bar_r_crearance, plate_thickness, bar_space_w, plate_d) {
+    create_armrest_plate(plate_thickness, plate_d);
     
     t_h = plate_thickness+cube_c_size[2]/2;
     
@@ -122,20 +121,8 @@ module create_armrest(cube_c_size, bar_cylinder_r, bar_cylinder_w, bar_crearance
     create_armrest_c_cube(cube_c_size, bar_cylinder_r, bar_cylinder_w, bar_crearance, bar_r_crearance);
 }
 
-/*// d1,2,3: 3本の柱の長さ, bar_h: バーの長さ, bar_r:バーの半径, cube_w:柱の幅, cube_h:柱の高さ
-module create_armrest_bar(d1, d2, d3, bar_h, bar_r, cube_w, cube_h) {
-    cube([cube_w, d1, cube_h]);
-    translate([cw/2-cube_w, 0, 0])
-    cube([cube_w, d2, cube_h]);
-    translate([cw-cube_w, 0, 0])
-    cube([cube_w, d3, cube_h]);
-    translate([0, cube_w/2, cube_h/2])
-    rotate([0, 90, 0])
-    cylinder(r=bar_r, h=bar_h, $fn=50);
-}
-*/
-//create_gear(gear_num=36, h=1, r=5, rd=20);
 
+// ギアのパラメータ
 gear_h = 3;
 gear_num = 18;
 gear_r = 5;
@@ -144,19 +131,19 @@ gear_box_size = [12, 12, 3.5];
 gear_box_crealance = 0.2;
 gear_box_crealance_rd = 6.0;
 
+// アームレストのパラメータ
 armrest_base_cube_size = [2,5,4];
 armrest_bar_cylinder_w = 10;
 armrest_bar_cylinder_r = 2;
 armrest_bar_space_w = 90;
-
 armrest_bar_crearance = 0.5;
 armrest_bar_r_crearance = 2;
-armrest_cube_c_size = [10, 10, 10];
-armrest_plate_thickness = 3;
+armrest_cube_c_size = [10, 10, 5];
+armrest_plate_thickness = 2;
+armrest_plate_d = 50;
 
 /*
-// case1
-// caseのベースを作る
+//　右のケースを作る
 difference() {
     create_base_case1();
     translate([15, 90, 10])
@@ -175,21 +162,9 @@ translate([30, -5, 5]){
     create_armrest_bar(armrest_bar_space_w, armrest_base_cube_size, 16, 18, 17, 30, armrest_bar_cylinder_w, armrest_bar_cylinder_r);
 }
 */
-/*
-// armrest
-create_armrest(armrest_cube_c_size, armrest_bar_cylinder_r, armrest_bar_cylinder_w, armrest_bar_crearance, armrest_bar_r_crearance, armrest_plate_thickness, armrest_bar_space_w);
-*/
-
-/*
-// foot
-foot_size = [gear_r*2, 45, 10];
-cube(foot_size);
-translate([gear_r, gear_r, foot_size[2]])
-create_gear(gear_num=gear_num, h=gear_h, r=gear_r, rd=gear_rd);
-*/
 
 
-// case2
+// 左のケースを作る
 difference() {
     create_base_case2();
     translate([-31, 90, 10])
@@ -209,10 +184,22 @@ translate([-30, -5, 5]){
 }
 
 
-//create_base_case2();
+/*
+// armrestを作る
+create_armrest(armrest_cube_c_size, armrest_bar_cylinder_r, armrest_bar_cylinder_w, armrest_bar_crearance, armrest_bar_r_crearance, armrest_plate_thickness, armrest_bar_space_w, armrest_plate_d);
+*/
 
 /*
-//gear test
+// 足を作る
+foot_size = [gear_r*2, 45, 10];
+cube(foot_size);
+translate([gear_r, gear_r, foot_size[2]])
+create_gear(gear_num=gear_num, h=gear_h, r=gear_r, rd=gear_rd);
+*/
+
+
+/*
+// ギアをテストプリントする
 translate([20, 0, 0])
 create_gear_base(gear_box_size, gear_num, gear_h, gear_r, gear_rd, gear_box_crealance, gear_box_crealance_rd);
 
@@ -222,15 +209,9 @@ translate([gear_r, gear_r, foot_size[2]])
 create_gear(gear_num=gear_num, h=gear_h, r=gear_r, rd=gear_rd);
 */
 
-/*
-translate([30, -5, 5]){
-    create_armrest_bar(armrest_bar_space_w, armrest_base_cube_size, 16, 18, 17, 30, armrest_bar_cylinder_w, armrest_bar_cylinder_r);
-}
-*/
 
 /*
-// armrestのtest
-//translate([0, -1, 20])
+// armrestをテストプリントする
 translate([-20, 30, 0]) {
     create_armrest_bar(armrest_bar_space_w, armrest_base_cube_size, 20, 20, 20, 20, armrest_bar_cylinder_w, armrest_bar_cylinder_r);
     translate([0, 10, 0])
@@ -244,23 +225,4 @@ difference(){
     translate([-10, -190, -10])
     cube([200, 180, 14]);
 }
-*/
-
-// 以下ゴミ
-/*
-// arm_rest_bar
-cw = 95;
-cr = 2;
-ccr = 4;
-arm_rest_bar_w = 95;
-arm_rest_bar_r = 2;
-arm_rest_bar_cube_w = 4;
-arm_rest_bar_cube_h = 6;
-dw = 40;
-dy = -5;
-dh = 5;
-translate([dw, dy, dh])
-create_armrest_bar(18, 14, 20, arm_rest_bar_w, arm_rest_bar_r, arm_rest_bar_cube_w, arm_rest_bar_cube_h);
-translate([-cw-dw, dy, dh])
-create_armrest_bar(10, 22, 17, arm_rest_bar_w, arm_rest_bar_r, arm_rest_bar_cube_w, arm_rest_bar_cube_h);
 */
